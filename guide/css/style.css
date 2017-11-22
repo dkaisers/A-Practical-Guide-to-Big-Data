@@ -1,0 +1,148 @@
+html {
+  font-size: 1em;
+  font-family: 'Source Sans Pro', sans-serif;
+  box-sizing: border-box;
+  color: #222;
+  line-height: 1.5em;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+    max-width: 800px;
+    margin: 8em auto;
+    padding: 0 2em;
+    text-align: justify;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    background-color: rgba(0,0,0,0.85);
+    color: #fff;
+}
+
+header a:hover {
+    color: #fff !important;
+    text-decoration: none;
+}
+
+header #navBox {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2em;
+}
+
+header #navBox nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+header #navBox a {
+    color: #d44;
+    font-weight: 300;
+    display: inline-block;
+    padding: 0.25em 0;
+}
+
+header #navBox nav ul ul {
+    display: none;
+}
+
+header #navBox nav ul li {
+    display: inline-block;
+}
+
+header #navBox nav ul li:hover a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+header #navBox nav ul li:hover ul {
+    position: absolute;
+    background-color: rgba(0,0,0,0.85);
+    padding: 0 2em 0.5em 2em;
+    left: 0em;
+    display: block;
+}
+
+header #navBox nav ul li:hover ul li {
+    display: block;
+}
+
+header #navBox nav ul li:hover ul li a {
+    display: block;
+}
+
+header #navBox span {
+    position: absolute;
+    top: 0;
+    right: 2em;
+}
+
+a {
+    color: #c33;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', serif;
+    font-weight: 900;
+    letter-spacing: 0.0em;
+    margin-top: 2em;
+}
+
+h1 {
+    font-size: 3em;
+    font-style: italic;
+    text-align: center;
+    line-height: 1em;
+    margin: 3em 0 2em 0;
+}
+
+code, pre {
+    font-family: 'Source Code Pro', monospace;
+    background: #eee   ;
+    border: 1px solid #ccc;
+    border-radius: 0.25em;
+    padding: 0 0.25em;
+    overflow: scroll;
+    font-size: 0.8em;
+}
+
+pre {
+    padding: 0.25em 0.5em;
+    margin: 1.5em 0;
+}
+
+em {
+    font-style: italic;
+}
+
+blockquote {
+    background: #eee;
+    border-left: 1em solid #ccc;
+    padding: 1em;
+    margin: 0;
+}
+
+img {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 0.25em;
+    padding: 0.5em;
+    background: #eee;
+}

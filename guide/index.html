@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>A Practical Guide to Big Data</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Merriweather:400,400i,700,900,900i|Source+Code+Pro|Source+Sans+Pro:300,400,400i,700,700i" rel="stylesheet">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <header>
+            <div id="navBox">
+                <nav>
+                    <ul>
+                        <li><a>Table of Contents &#9662;</a>
+                            <ul>
+                                <li><a href="#C01">Prerequisites</a></li>
+                                <li><a href="#C02">Introduction</a></li>
+                                <li><a href="#C03">Apache Zeppelin</a></li>
+                                <li><a href="#C04">Apache Hadoop, HDFS &amp; MapReduce</a></li>
+                                <li><a href="#C05">Apache Pig</a></li>
+                                <li><a href="#C06">Apache Spark</a></li>
+                                <li><a href="#C07">Looking Forward</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+
+                <span><a href="#">&#8593; Top</a></span>
+            </div>
+        </header>
+
+        <h1>A Practical Guide to Big Data</h1>
+
+        <p>This guide is designed to introduce the reader into the field of Big Data by experimenting with different technologies. It provides all the necessary tools in form of a virtual machine. With the Big Data software infrastructure already in place, the guide is able to focus solely on using the tools to extract new insights from a set of raw data.</p>
+
+        <h2 id="C01">Prerequisites</h2>
+
+        <p>The following software and hardware is needed to work through the practical examples of the guide:</p>
+
+        <ul>
+            <li><a href="https://www.vagrantup.com/">Vagrant 2.0.0+</a> to manage and automatically provision the virtual machine.</li>
+            <li>4 GB of free memory for the virtual machine to work.</li>
+            <li>A modern browser.</li>
+        </ul>
+
+        <p>Be aware that the guide will consume more than 3 GB of internet traffic. Besides the folder of the guide itself, that provides the data set, the virtual machine will also install a number of different software tools upon starting it for the first time.</p>
+
+        <h2 id="C02">Introduction</h2>
+
+        <p>Big Data has become a driving force of change in nearly every sector of the economy and government imaginable. But while the technologies and methods become better and more widely used, there is a rising demand for talent in the field as well. Interested individuals are always faced with a harsh learning curve in order to get started with Big Data. Be it that the available information is mainly technical or theoretical, or that it takes a considerate amount of time to even get a basic infrastructure working.</p>
+
+        <p>This guide was designed to circumvent those problems. It focuses on applying different freely available technologies to a set of example data. In order to achieve that focus, the software infrastrucure necessary is provided via a virtual machine. The reader just needs to start the VM and can begin experimenting with the data through a user-friendly web interface. All the tools used in the guide are open source and freely available to make Big Data as accessible as possible to the reader.</p>
+
+        <p>After working through the guide, the reader will be able to utilize the provided software infrastructure on his or her own sets of data. The introduced technologies and methods allow for a basic exploratory study of data sets that result in the creation of new analytical insights into the data as well as the creation of supporting visualizations.</p>
+
+        <p>In the end, this guide tries to serve as a basic starting point for interested individuals. With the knowledge gained from working thorugh it, the reader should be able to further acquire more in-depth knowledge of Big Data and its different parts and apply it in different circumstances.</p>
+
+        <h3>What is Big Data?</h3>
+
+        <p>Before getting started, this section will briefly talk about what the term Big Data actually means. The guide is based on the following definition of Big Data by De Mauro, Greco and Grimaldi from their 2016 paper <i>A formal definition of Big Data based on its essential features</i>:</p>
+
+        <blockquote>Big Data is the Information asset characterized by such a High Volume, Velocity and Variety to require specific Technology and Analytical Methods for its transformation into Value.</blockquote>
+
+        <p>The data itself is defined at the beginning by three different aspects. Volume is the size of the data set. Velocity is the speed at which new data becomes available. Variety are the differences in types and structure of the data. In combination, the datasets for any Big Data application become highly complex to handle.</p>
+
+        <p>The second part of the definition mentions technologies and algorithms. While there are traditional tools available to process data, those are mostly not applicable in the case of Big Data due to a number of reasons. For example the data set may be simply to big to be processed by them, or they can't handle its complexity in terms of variety in structure. Big Data technologies and algorithms are made especially to tackle those problems by not relying on pre-defined structures and being able to process vast amounts of data using multiple computers in parallel.</p>
+
+        <p>As with any type of analysation, some kind of value is being extracted from the input data, which is mentioned in the last part of the definition. In the case of Big Data, that value often comes in the form of insights that have been previously unknown. A good example for this are the recommendation systems, like the ones used by streaming services and online retailers. Machine learning algorithms are used to find new correlations and patterns in the data to gain a competitive advantage over the competition.</p>
+
+        <p>In summary, Big Data tries to utilise the vast amounts of data that are being generated and whose rate of generation keeps increasing. That utilisation comes in the form of new technologies and analytical methods that help in gaining insights into the data.</p>
+
+        <h3>Starting the Virtual Machine</h3>
+
+        <p>The virtual machine is provided in form of a <i>Vagrantfile</i> together with a number of provisioning scripts and configuration files that can be found in the <a href="https://github.com/dkaisers/A-Practical-Guide-to-Big-Data">GitHub repository</a> accompanying this guide. This site itself as well as all of the exemplary data is also present in the repository and will be uploaded to the virtual machine upon starting it for the first time.</p>
+
+        <p>In order to start the virtual machine, download the repository and navigate into the <code>virtual-machine</code> folder in the command line of your choosing. After that, simply issue the <code>vagrant up</code> command. Starting the virtual machine for the first time will take a few minutes, as the script needs to download all of the necessary software packages and install them.</p>
+
+        <p>To pause the virtual machine, only use the <code>vagrant suspend</code> command. This will allow the virtual machine to be used later again by unpausing it with <code>vagrant up</code>. Please do not use <code>vagrant halt</code> to turn off the virtual machine, as the tools may not work properly after completely restarting the virtual machine.</p>
+
+        Once the <code>vagrant up</code> command has finished, the web interface that will be used throughout the guide can be viewed by navigating to <a href="http://192.168.33.10:8080/">http://192.168.33.10:8080/</a>. If this IP address is causing issues for your specific network configuration, it can be changed in the <code>Vagrantfile</code>.
+
+        <h2 id="C03">Apache Zeppelin</h2>
+
+        <p>The <a href="http://zeppelin.apache.org/">Apache Zeppelin</a> project is a web-based notebook application. It allows to interact with a number of different Big Data tools through so-called notebooks. These can also be shared collaboratively as well as exported and imported on different deployments.</p>
+
+        <p>As a Apache project, it is completely free to use and open-source. It is a great tool to analyse and experiment with a data set. There are a number of different alternatives available. It should be said though, that not all user interfaces for Big Data look like this type of tool or are even remotely structured like it. Various tools for different purposes can be found that allow access to a Big Data infrastructure and help with the analysis and visualisation. Most of those tools are commercial products.</p>
+
+        <p>On the side of Big Data driven features for end user applications, most user interfaces are implemented by the application itself. Examples for this are the various different recommendation engines in applications like Netflix, Spotify or Amazon. Another prominent example are advertisements like the ones from Google, that use Big Data in combination with machine learning to deploy personalised advertisements to each single user.</p>
+
+        <h3>Using Zeppelin</h3>
+
+        <p>As previously mentioned, the web interface for Zeppelin can be reached by navigating to <a href="http://192.168.33.10:8080/">http://192.168.33.10:8080/</a> in the browser. On the start page of Zeppelin you will find a list of notes, that currently only contains the included examples. Click on <em>Create new note</em>, enter <code>Hadoop &amp; HDFS</code> as the name and select <em>sh</em> as the default interpreter. After clicking <em>Create Note</em>, the note will be created and you will be redirected to its page.</p>
+
+        <img src="img/guide_001.png" alt="Zeppelin Homepage">
+
+        <p>A note is basically a blank sheet of paper to analyse the data on. Each note consists of one or more paragraphs, with each paragraph being able to simply display some information or execute a set of commands in one of Zeppelin's supported tools. There is also the option to execute the complete note on a schedule by clicking on the small clock icon at the top. This allows the note keep displaying the most current results of your analysis without manually having to re-execute the steps everytime.</p>
+
+        <p>You will see an empty paragraph on your note. Click on it to focus it and a blinking cursor should appear. Now type in the bash command <code>pwd</code> and execute the paragraph by either clicking on the play icon in its top right corner, or pressing <code>Shift + Enter</code>.</p>
+
+        <p>The result should look like the image below, displaying the current folder of the shell. This works because we selected <em>sh</em> as the default interpreter for this note. An interpreter is a part of Zeppelin that is used to execute the commands in the paragraph. In the case of <em>sh</em>, the interpreter is a simple shell like the one you used to start the virtual machine.</p>
+
+        <img src="img/guide_002.png" alt="Zeppelin Homepage">
+
+        <p>We will be using a number of different interpreters throughout the guide. To select an interpreter for a paragraph that is not the default one of the note, simply put something like <code>%sh</code> in the first line of the paragraph's commands. For now, our default shell interpreter is all we need.</p>
+
+        <h2 id="C04">Apache Hadoop, HDFS &amp; MapReduce</h2>
+
+        <p>The <a href="http://hadoop.apache.org/">Apache Hadoop</a> software library is the heart and soul of nearly every Big Data application. Besides some common utilities for it's usage, it consists of three different modules that make up the basis for a multitude of other tools that are built on top of Hadoop.</p>
+
+        <p>The first module is HDFS, short for <em>Highly Distributed File System</em>. It is a file system that can run distributed over multpile servers and focuses on throughput. This means, the datacenter is not limited by the performance and storage of a single system, but can easily scale up its operation with increasing demand.</p>
+
+        <p>The second module is named YARN, short for <i>Yet Another Resource Negotiator</i>, and takes care of scheduling the execution of jobs on the Hadoop cluster as well as managing its resources. We won't be directly interacting with it in this guide, but it still works for us.</p>
+
+        <p>The third module is called MapReduce and will be explained in more detail in one of the following sections of the guide.</p>
+
+        <h3>Using HDFS</h3>
+
+        <p>As a first analysis task, we will be doing a word length count on a text file, which counts how often each length of a word occurs in the text. The file is located on the virtual machine under <code>/home/vagrant/examples/wordLengthCount/alice.txt</code>. It is the text to Lewis Carroll's fantasy novel <em>Alice's Adventures in Wonderland.</em> But to utilise Hadoop, it first needs to be put onto HDFS.</p>
+
+        <p>In order to achieve that, replace the <code>pwd</code> in the first paragraph of the still opened up <em>Hadoop &amp; HDFS</em> notebook with the following line of code.</p>
+
+        <pre>hdfs dfs -put /home/vagrant/examples/wordLengthCount/alice.txt alice.txt</pre>
+
+        <p>This command will tell HDFS to load the local file onto the distributed file system. In this case it is still on the same computer, as we only work with a single virtual machine, but in a real-world scenario, Hadoop will decide for itself where to put the file exactly.</p>
+
+        <p>To check that the file was successfully loaded onto HDFS, execute the <code>hdfs dfs -ls</code> command in the paragraph. It should result in a list containing a single item, the <code>alice.txt</code> file. There are various other sub-commands that can be substituted for the <code>ls</code> part of the last command. The sub-commands are based on the traditional commands used on the command line to navigate and manipualte the file system. For example, <code>rm</code> is used to remove files from the HDFS and <code>mkdir</code> is used to create new folders.</p>
+
+        <h3>MapReduce</h3>
+
+        <p>Now that we have our text in HDFS, let's do the actual word length count. That is where the third Hadoop module, named MapReduce, will come into play. MapReduce is a programming model to process large data sets (with the help of YARN and HDFS) in parallel.</p>
+
+        <p>Every MapReduce program consists of two parts, a <em>mapping function</em> and a <em>reduction function</em>. First the mapping function will create key-value-pairs from the input data, after which the reduction function will process the pairs grouped together by their key.</p>
+
+        <p>In the case of the word length count, for each word in the text, the mapping function will create a key-value-pair consisting of the length of the word as the key and a value of <em>1</em>, which indicates that the respective length was found one time in the text. The reduction function will then get the pairs grouped by the length of words and simply sum all values together to create the result.</p>
+
+        <p>In a real Hadoop cluster with multiple servers, each server will execute the map function on its local data on the HDFS, and there is an intermediate <em>shuffle step</em> between the mapping and the reduction functions. The shuffle will redistribute the data based on the keys so that each group is located on a single server in order for the reduction to work properly. This allows for the parallel processing of large amounts of data across multiple machines.</p>
+
+        <p>There is another file besides <code>alice.txt</code> in the example folder of the word length count, which is the already compiled program called <code>WordLengthCount.jar</code>. As Hadoop is created in Java, it is also the most common language in which MapReduce programs are created. The next sections will explain each function in more detail and finally execute the program.</p>
+
+        <h3>Mapping Function</h3>
+
+        <p>The mapping and reduction functions are actually full-fledged Java classes, extending Hadoop's provided base classes and overwriting the necessary functions for their desired application. The following code snippet is the <em>Mapper class</em> of the word length count.</p>
+
+        <pre>
+public static class Map
+    extends Mapper&lt;Object, Text, IntWritable, IntWritable&gt; {
+
+    @Override
+    public void map(Object key, Text value, Context context)
+        throws IOException, InterruptedException {
+
+        StringTokenizer tokenIterator = new StringTokenizer(value.toString());
+        while (tokenIterator.hasMoreTokens()) {
+            String word = tokenIterator.nextToken();
+            context.write(new IntWritable(word.length()), new IntWritable(1));
+        }
+    }
+}</pre>
+
+        <p>Each Mapper must extend the Hadoop <code>Mapper&lt;KEYIN, VALUEIN, KEYOUT, VALUEOUT&gt;</code> class and define the types for the input and output values using Java's generics functionality. Hadoop also provides special type classes to be used, and custom ones can be created. This allows a MapReduce program to be able to process virtually any type of data. In our case, <code>Text</code> basically represents a <code>String</code> and <code>IntWritable</code> an <code>int</code>.</p>
+
+        <p>The <code>map</code> function gets the text of the <code>alice.txt</code> file as a <code>Text</code> value. First, the contained <code>String</code> is split apart using the <code>StringTokenizer</code> class, which splits the string at each occurence of whitespace. Next, the results of the tokenization are iterated over and for each token or word the <code>map</code> function outputs a key-value-pair of the word's length as key and the value of <code>1</code>.</p>
+
+        <h3>Reduction Function</h3>
+
+        <p>Next up is the reduction function. Similarily to the mapping function, it is its own class that extends Hadoop's <code>Reducer</code> base class. And again, the class's input and output types for keys and values can be customised using generics, to allow for the most flexibility in using MapReduce.</p>
+
+        <pre>
+public static class Reduce
+    extends Reducer&lt;IntWritable, IntWritable, IntWritable, IntWritable&gt; {
+
+    @Override
+    public void reduce(IntWritable key, Iterable<IntWritable> values, Context context)
+        throws IOException, InterruptedException {
+
+        int sum = 0;
+        for (IntWritable val : values) {
+            sum += val.get();
+        }
+        context.write(key, new IntWritable(sum));
+    }
+}</pre>
+
+        <p>In the case of the word length count, the reduction function will simply go through all values for a key and sum them up to create a total count for how often each length of word occurs in the text. The <code>reduce</code> function gets the values as an <code>Iterable</code>, so this is done simply by iterating over all the values and adding each one to a variable holding the current total. Afterwards, the resulting sum is written out.</p>
+
+        <h3>Executing the Program</h3>
+
+        <p>As mentioned before, an already compiled version of the word length count is provided in the same folder as the <code>alice.txt</code> file. Besides including the Mapper and Reducer classes, it configurates a few additional things for the program to run on Hadoop. More info on this can be found on Hadoop's website. It is skipped in this guide as MapReduce is mainly introduced to explain what happens in the background when using more high-level tools to interact with a Hadoop cluster.</p>
+
+        <p>Using the blank paragraph at the bottom of the Zeppelin notebook, execute the following two lines using the shell interpreter. The first one will make sure that any previous results are deleted from HDFS before executing the MapReduce program by calling the Hadoop command line tool with the program file, a name for the job, the input file(s) and the directory on HDFS to store any output specified as arguments. The execution will take a few moments and print out a number of log entries produced by Hadoop.</p>
+
+        <pre>
+hdfs dfs -rm -f -r wordLengthCounts/output
+hadoop jar /home/vagrant/examples/wordLengthCounts/WordLengthCount.jar WordLengthCount alice.txt wordLengthCount/output</pre>
+
+        <p>Once the program execution has finished, execute the following line in yet another paragraph with the shell interpreter. It will print out the results produced by the word length count example. Displayed on the left of each output line is the length of a word and on the rigth the number of times a word of that length occurs in the text.</p>
+
+        <pre>hdfs dfs -cat wordLengthCount/output/*</pre>
+
+        <p>The <code>*</code> wildcard operator at the end of the HDFS path assures that any file produced by the program will be printed out. The number of result files depends on the number of Reducers used by the job. This happens for example on a cluster of multiple servers. Each Reducer will produce its own result file. There is also the option to download a merged version of all result files from the HDFS using the <code>hdfs dfs -getmerge</code> command line option.</p>
+
+        <h2 id="C05">Apache Pig</h2>
+
+        <p>There is a lot of work involved in creating MapReduce programs, which is why tools exist on top of MapReduce that abstract that process by providing other means of analyzing the data at hand. One of those tools is <a href="http://pig.apache.org/">Apache Pig</a>. It offers the user a high-level language to analyse data, called <em>Pig Latin</em>, that is compiled to a sequence of MapReduce-programs by the tool itself.</p>
+
+        <p>This allows users to effortlessly experiment with data sets without writing and compiling specific MapReduce-programs for each and every query on the data set. To showcase this, in a first step we will reproduce our simple word length count MapReduce-program with Apache Pig.</p>
+
+        <h3>Word Length Count Simplified</h3>
+
+        <p>As a first step, create a new notebook named <em>Pig</em> with <em>pig</em> as the default interpreter. There are actually two different Pig interpreter built into Apache Zeppelin. The default one, <code>%pig.script</code>, is to be used as a shell to run Pig Latin scripts that do not need any type of output. An example for this would be the pre-processing of some data that is then stored on HDFS. The other interperter is <code>%pig.query</code> and expects the last line of the Pig script to return data in order for Apache Zeppelin to display the results in one of its built-in visualisations.</p>
+
+        <p>As we will be using the latter one of the two Pig interpreters, the first line of our Pig script should read <code>%pig.query</code>. Following this statement is the line <code>lines = LOAD 'alice.txt';</code>. This will load the text file <em>alice.txt</em> from HDFS and store its contents separated by lines into the <code>lines</code> alias, which basically functions as a variable. Pig calls each of those lines tuples. A tuple can consist of one or more fields of data.</p>
+
+        <p>The next step is to split the lines of text into their respective words. In order to achieve this, line number three of our script iterates over each line with the <code>FOREACH</code> statement, splits the line into its words by using the <code>TOKENIZE</code> function and stores the result into the <code>wordsPerLine</code> alias. The script now looks like this.</p>
+
+        <pre>
+%pig.query
+
+lines = LOAD 'alice.txt';
+wordsPerLine = FOREACH lines GENERATE TOKENIZE($0) AS words;</pre>
+
+        <p>The keyword <code>AS</code> gives the resulting data points an identifier and the <code>$0</code> part of the line accesses the first data point of each line stored in <code>lines</code>, which in our case is also the only one: the line of text itself.</p>
+
+        <p>The result of the last line of the script is a list of each line of text split into its words. In order to transform this into a single list of words, we will again iterate over the data using <code>FOREACH</code>, but now use the <code>FLATTEN</code> function to split the list of words per line up.</p>
+
+        <p>Following the transformation into a list of words is a <code>FILTER</code> statement using the <code>MATCHES</code> operator with a simple regular expression to only include those tuples that are clearly words of alphanumeric nature. This is an additional step in comparison to the previous MapReduce example, because the Pig <code>TOKENIZER</code> function works not as good as Java's <code>StringTokenizer</code> class. After that, another <code>FOREACH</code> statement in combination with the <code>SIZE</code> function is used to calculate the length for each word.</p>
+
+        <p>Finally, the tuples are grouped by the length of word using the <code>GROUP BY</code> statement and for each group the count of words of that length is calculated using another <code>FOREACH</code> statement with a <code>COUNT</code> function. All in all, the Pig Latin script version of our word length count example looks as follows:</p>
+
+        <pre>
+%pig.query
+
+lines = LOAD 'alice.txt';
+wordsPerLine = FOREACH lines GENERATE TOKENIZE($0) AS words;
+words = FOREACH wordsPerLine GENERATE FLATTEN(words) AS word;
+words = FILTER words BY word MATCHES '\\w+';
+wordLengths = FOREACH words GENERATE SIZE(word) as length;
+lengthGroups = GROUP wordLengths BY length;
+FOREACH lengthGroups GENERATE group AS length, COUNT(wordLengths) AS count;</pre>
+
+        <p>Beware that the last line of the Pig script does not store the tuples into an alias. The <code>%pig.query</code> interpreter expects the last line of the script to return some data to be visualised in the Zeppelin paragraph. Executing the script will display a table of data with two columns for the length of a word and the corresponding number of words with that length. Pressing the button for a <em>bar chart</em> will display the result in a nice and clean visualisation that should look like the one below.</p>
+
+        <img src="img/guide_003.png" alt="Word Length Count using Pig">
+
+        <h3>CSV Handling</h3>
+
+        <p>Our results from the word length count example can be easily made reusable using Apache Pig to store the analysis results in the HDFS. In this case we will be creating a simple CSV file to store the results in.</p>
+
+        <p>Copy the script from the previous section to a new paragraph in our Pig notebook. Change the interpreter to <code>%pig.script</code> and prepend the last line with <code>results = </code> to store the results in an alias. The last step is to append <code>STORE results INTO 'wordLengthCounts.csv' USING PigStorage(';');</code> to the script. In the end it should look like this:</p>
+
+        <pre>
+%pig.script
+
+lines = LOAD 'alice.txt';
+wordsPerLine = FOREACH lines GENERATE TOKENIZE($0) AS words;
+words = FOREACH wordsPerLine GENERATE FLATTEN(words) AS word;
+words = FILTER words BY word MATCHES '\\w+';
+wordLengths = FOREACH words GENERATE SIZE(word) as length;
+lengthGroups = GROUP wordLengths BY length;
+results = FOREACH lengthGroups GENERATE group AS length, COUNT(wordLengths) AS count;
+STORE results INTO 'wordLengthCountsPig' USING PigStorage(';');
+</pre>
+
+        <p>Executing this altered script will still calculate the word length counts in the <code>alice.txt</code> file, but instead of displaying them in Zeppelin, the results will be stored as a CSV file in the HDFS in the folder <em>wordLenghtCounts</em>. Loading the results and visualizing them is now as easy as executing the line <code>LOAD 'wordLenghtCounts' USING PigStorage(';');</code> using the <code>%pig.query</code> interpreter.</p>
+
+        <p>This ease of use makes Pig a great tool to experiment with a dataset and explore different features of the data using Zeppelin's visualization capabilities. And if there is some functionality missing from Pig, there is the possibility to create <em>user defined functions</em> in another programming language like Java or Python</p>
+
+        <h2 id="C06">Spark</h2>
+
+        <p>The next level up of Apache Pig is <a href="http://spark.apache.org/">Apache Spark</a>, which works in a similar fashion, but is more powerful due to its higher flexibility in handling the data and integrated abilities for machine learning. It is a framework for data analysis that can be used with the Scala, Java, R and Python programming languages. The latter of which we will be using in this guide. The main difference between Spark and a tool like Pig is, that Spark does not use MapReduce but includes its own parallel execution scheme that processes the data in-memory. This is a lot faster, but also prone to memory limitations when working with large data sets.</p>
+
+        <h3>Data Set</h3>
+
+        <p>Before going into more detail with the Spark examples, let's take a look at the data set for this chapter of the guide. Published by the UK government, the <a href="https://data.gov.uk/dataset/road-accidents-safety-data">Road Safety Data</a> data set includes detailed information on all British traffic accidents with human injuries from 2009 to 2016. All in all the data set contains <em>1 176 602</em> distinct tarffic accidents.</p>
+
+        <p>The first step is to put the data onto HDFS for further analysis. The <code>/home/vagrant/examples/accidents/</code> folder of the repository contains a CSV file for each year of data named <code>accidents_*.csv</code>. Create a new folder on the HDFS called <code>accidents</code> by supplying the <code>hdfs dfs -mkdir accidents</code> command to a Zeppelin paragraph with the shell interpreter. Afterwards upload the data by issuing the <code>hdfs dfs -put /home/vagrant/examples/accidents/accidents_*.csv accidents/</code> command and verify that the data was successfully loaded into HDFS using the <code>-ls</code> command</p>
+
+        <p>With the data on the HDFS, create a new Zeppelin notebook called <code>Spark</code>. In the first paragraph, execute the following lines to display a subset of the complete data in Zeppelin's build in table visualisation.</p>
+
+        <pre>
+%pyspark
+
+accidents = spark.read.option("header", "true").csv("hdfs://localhost:54310/user/vagrant/accidents/*.csv")
+
+z.show(accidents)</pre>
+
+        <p><code>%pyspark</code> tells Zeppelin to use the Python interpreter in combination with Spark. Within this environment, the <code>spark</code> variable can be used to access the Spark session and <code>z</code> to access the Zeppelin context. The Spark session is used to read all CSV files in the <code>accidents</code> folder on the HDFS. The <code>option("header", "true")</code> part of the line tells Spark, that each file contains a header line to use as column names. Afterwards the data is exposed to the Zeppelin context using the <code>z.show(accidents)</code> command.</p>
+
+        <p>The data displayed in the table does not contain any textual data. Besides identifying information like a unique index per accident, or numerical values like the latitude and longitude of an accident's location, the dataset only contains coded data. The accompanying <em>Road-Accident-Safety-Data-Guide.xls</em> file explains how to interpret the different values that are encoded and can be found in the same folder as the accident data CSVs.</p>
+
+        <h3>Simple Analytics</h3>
+
+        <p>As a starting point to experiment with this data, we will calculate and visualize the total number of accidents per year. It's helpful to keep the table of data open at the top of the notebook to be able to check what data is available and how it is structured. So, in the second paragraph of the Spark notebook, start by defining the <code>%pyspark</code> interpreter to be used again.</p>
+
+        <p>The first line of actual Spark/Python code stays the same as well. Copy the line from the previous paragraph to read the CSV files and store the data in the <code>accidents</code> variable. Next, extract the year of each accident from the data. The data is stored in the form of a <code>DataFrame</code> object, which provides a number of different methods to access the data similar to Apache Pig and other querying languages like SQL. The year is stored in the <code>Date</code> column as a textual value in the form of <code>dd/mm/yyyy</code>. Append the following line to the script.</p>
+
+        <pre>
+years = accidents.select(accidents["Date"].substr(7, 4).alias("year"))</pre>
+
+        <p>The <code>select</code> function works exactly as in SQL. It expects a list of columns to be read into the new variable. In this case, we only want to store the year of each accident in the <code>years</code> variable. To achieve this, first the <code>Date</code> column is selected using <code>accidents["Date"]</code>. Secondly, the <code>substr(7, 4)</code> extracts the last four characters of each <code>Date</code> value, which contain the year. Finally, the the newly extracted information is said to be stored in the <code>year</code> column using the <code>alias("year")</code> function.</p>
+
+        <p>After extracting the year of each accident, the next step is to calculate the total number of accidents per year. This is done by using the <code>groupBy</code> function. It expects a list of columns by which the data should be grouped and the result is a special type of <code>DataFrame</code> object that exposes the option of different aggregate functions to be called on the grouped data. In our case, a simple count of the records in each group will do. The final step of the script is to expose the data to the Zeppelin context for visualisation. The complete script looks like this:</p>
+
+        <pre>
+%pyspark
+
+accidents = spark.read.option("header", "true").csv("hdfs://localhost:54310/user/vagrant/accidents/*.csv")
+years = accidents.select(accidents["Date"].substr(7, 4).alias("year"))
+countsByYear = years.groupBy("year").count()
+
+z.show(countsByYear)</pre>
+
+        <p>Executing the script will result in another data table to be displayed. Selecting the <em>Line Chart</em> from the list of available Zeppelin visualisations will display a nice graph that indicates an overall trend of a decreasing number of accidents each year with a small intermediate increase in 2014.</p>
+
+        <img src="img/guide_004.png" alt="Accidents per Year using Spark">
+
+        <p>If your graph does not look smilar to the one above, check under the visualization's settings that <code>year</code> is selected as <em>Keys</em> and <code>count SUM</code> is selected as <em>Values</em>.</p>
+
+        <p>The total number of accidents per year example includes a single feature into the analysis and visualisation. Most of the value that can be extracted from a dataset is done so by using multiple features in conjuncture. To demonstrate this, the next example will look into the number of accidents by day of week and time of day.</p>
+
+        <p>The script starts exactly the same as before. First, <code>%pyspark</code> is set as the interpreter to use and then all accidents are loaded from HDFS into the <code>accidents</code> DataFrame. The relevant columns of the dataset are <code>Day_of_Week</code> and <code>Time</code>. While <code>Day_of_Week</code> can be used without any modifications, the <code>Time</code> values need to be modified in order to be grouped by the hour. Grouping the data by the <code>Time</code> column directly, would result in too many different value groups for Zeppelin to visualise.</p>
+
+        <p>Besides that, some accidents do not have a value for the <code>Time</code> column and need to be excluded using the <code>filter</code> function of a DataFrame. Given the parameter <code>"Time != 'null'"</code>, it will only return those records, that have a valid value for the <code>Time</code> column. Lastly, the hour values should be converted from textual values to numerical values using the <code>cast("int")</code> function. This ensures, that the data will be properly ordered in Zeppelin visualizations. Without this measure, the leading zero of some hour values would cause them to be sorted behind all other values. All in all these steps can be done using the following lines of the script:</p>
+
+        <pre>
+accidents = accidents.filter("Time != 'null'")
+accidents = accidents.select(accidents["Day_of_Week"], accidents["Time"].substr(0, 2).cast("int").alias("Hour"))</pre>
+
+        <p>Following up by grouping the data by the <code>Day_of_Week</code> and <code>Time</code> columns in combination with the <code>count()</code> function will result in the desired data that can be exposed to the Zeppelin context using <code>z.show(accidents)</code>. In the end, the script should look like this:</p>
+
+        <pre>
+%pyspark
+
+accidents = spark.read.option("header", "true").csv("hdfs://localhost:54310/user/vagrant/examples/accidents/accidents_*.csv")
+accidents = accidents.filter("Time != 'null'")
+accidents = accidents.select(accidents["Day_of_Week"], accidents["Time"].substr(0, 2).cast("int").alias("Hour"))
+accidents = accidents.groupBy("Day_of_Week", "Hour").count()
+
+z.show(accidents)</pre>
+
+        <p>Executing the script will display a data table that is not easy to extract any insight from. Switching the visualisation to the <em>Line chart</em> again and configuring the visualisation so that the <em>Keys</em> contains <code>Hour</code>, <em>Groups</em> contains <code>Day_of_Week</code> and <em>Values</em> contains <code>count SUM</code> will change that. The resulting line chart displays the number of accidents per hour of day with a differently colored line for each day of the week.</p>
+
+        <img src="img/guide_005.png" alt="Accidents per Time of Day and Day of Week using Spark">
+
+        <p>The legend for the colors can be found in the top right corner. As it is encoded information, the accompanying file of the dataset needs to be consulted. In this case, <code>1</code> stands for <em>Sunday</em> with each increasing number going forward one day until <code>7</code>, which stands for <em>Saturday</em>. While analyzing the chart, keep in mind that this data is out of context. The total number of accidents needs to be seen relative to the actual amount of traffic at any given time of day, since the more traffic exists, the more likely accidents happen.</p>
+
+        <p>But even without context, a few interesting observations can be made. For one, rush hours in the morning and afternoon seem like the most dangerous times to drive. Interestingly on Friday afternoons, the spike increases earlier than on the other workdays. On the other hand, weekends are generally safer than workdays with the exception of Saturdays at noon and the night times between 12 AM and 5 AM. Additionally, 5 AM appears to be the overall safest time to drive as it has the lowest number of accidents when looking at the week as a whole.</p>
+
+        <h3>Machine Learning</h3>
+
+        <p>One of the most common use cases for Big Data is <em>Machine Learning</em>, where the computer learns about the data it is given without explicitly being told what to look at (as we did in our previous examples). Fortunately, Spark has a few different Machine Learning algorithm built in.</p>
+
+        <p>In the following final example of this guide, we'll be using <em>K-Means clustering</em> with our traffic data set. This algorithm divides the data into <em>k</em> clusters according to the set of features it is given. It is generally used to identify hidden correlations and or coherencies in the data set as the algorithm will group those data isntances together that it sees as similar according to their features.</p>
+
+        <p>In our simluated use case, we want to establish a new nationally operating towing service in the UK and therefore want to identify 10 places that will have the best spheres of influence in terms of reachable traffic accidents. Since this use case asks for geographical clustering of the data, using the latitude and longitude of each accident is sufficient as a feature set for K-Means. A more general approach for situations without a specific use case would be to use all available features to cluster the data and sequentially reduce the set of features until all of the irrelevant ones are excluded from the clustering. The clustering then requires further analysis to determine the specific nature of each cluster according to the dominating values for each of the remaining features.</p>
+
+        <p>The start of the Python script differs slightly from previous examples, as additional dependencies need to be imported: the actual Machine Learning algorithm and the data type used by it. After this inital difference, the script returns to the usual sequence with loading the data set and selecting the relevant and valid records.</p>
+
+        <pre>
+%pyspark
+
+from numpy import array
+from pyspark.mllib.clustering import KMeans, KMeansModel
+
+accidents = spark.read.option("header", "true").csv("hdfs://localhost:54310/user/vagrant/accidents/accidents_*.csv")
+accidents = accidents.filter("Latitude != 'null' AND Longitude != 'null'")
+accidents = accidents.select('Latitude', 'Longitude')</pre>
+
+        <p>The K-Means algorithm of Spark requires the data to be in a specific format that has all the relevant values in an array. Therefore the next line of the script iterates over all records and maps the data into the desired format. Using the reformatted data, the K-Means algorithm is called and returns a <code>KMeansModel</code> object holding all the information extracted by K-Means. The parameters of the call determine that <em>10</em> clusters should be generated and that the inital positions of the clusters are randomized at the start of the algorithm. This causes the results to slightly differ each time the script is executed as K-Means uses the starting positions and adjusts them more and more using the given data.</p>
+
+        <pre>
+accidents = accidents.rdd.map(lambda row: array(row.asDict().values()))
+clusters = KMeans.train(accidents, 10, initializationMode = "random")</pre>
+
+        <p>The last step of the script is to display the results in Zeppelin the center coordinates of each cluster that can be found in the <code>clusters.clusterCenters</code> attribute. But as the resulting data is no longer a DataFrame object, the normal <code>z.show()</code> call can't be used. Instead we have to output the data by hand. First a <code>print("%table")</code> call tells Zeppelin to expect tabular data with each column separated by a <em>tab-character</em>. The following <code>print("Latitude\tLongitude")</code> determines the column headers. Without it, the first line of data would be used. Finally, the script iterates of the cluster centers and prints each one out. All in all, the script should look like this:</p>
+
+        <pre>
+%pyspark
+
+from numpy import array
+from pyspark.mllib.clustering import KMeans, KMeansModel
+
+accidents = spark.read.option("header", "true").csv("hdfs://localhost:54310/user/vagrant/accidents/accidents_*.csv")
+accidents = accidents.filter("Latitude != 'null' AND Longitude != 'null'")
+accidents = accidents.select('Latitude', 'Longitude')
+accidents = accidents.rdd.map(lambda row: array(row.asDict().values()))
+clusters = KMeans.train(accidents, 10, initializationMode = "random")
+
+print('%table')
+print('Latitude\tLongitude')
+
+for center in clusters.clusterCenters:
+    print(str(center[0]) + '\t' + str(center[1]))</pre>
+
+        <p>Executing the script will result in a table of 10 rows. Each row contains the latitude and longitude of a cluster center, which represents the 10 geographical positions that have the best access to the most accidents according to the data from 2009 to 2016. These positions can be used in our use case to determine the specific locations of stations for the new national towing service.</p>
+
+        <h3>Better Visualization with Matplotlib</h3>
+
+        <p>Looking at latitude and longitude values does not give a good idea where the cluster centers are actually located and the available Zeppelin visualisations are not equipped for this use case. Therefore the following section will create a custom visualisation using Python and its <a href="https://matplotlib.org/">Matplotlib</a> module, which allows for the creation of numerous different graphs and charts. In this specific instance, we'll be using the <a href="https://matplotlib.org/basemap/">Basemap</a> extension to display the location of the cluster centers on an acutal map of the UK.</p>
+
+        <p>First of all we need to alter the cluster generating script by adding two more imports at the top. <code>from mpl_toolkits.basemap import Basemap</code> for the Basemap extension and <code>import matplotlib.pyplot as plt</code> for the <em>Matplotlib</em> itself. The part of the script responsible for loading the dataset and calculating the clusters can stay unmodified, but remove the last the last part of the script that outputs the data to Zeppelin.</p>
+
+        <p>The first step for the custom visualisation is to create the Basemap itself and configure it so that only the UK is displayed instead of the whole earth. Besides that, configuring the colors of the map is recommended to produce a visually more pleasing result. The following four lines of code will do exactly that. We will be using a <em>Mercator projection</em> of the earth, as established by the <code>projection = 'merc'</code> parameter. The following lines of code define the area to be displayed using latitude and longitude values for the lower left and upper right corner of the map and the <code>resolution = "i"</code> parameter defines how detailed the coastlines are being drawn. Afterwards the colours are defined.</p>
+
+        <pre>
+basemap = Basemap(projection = "merc", llcrntlat = 49.5, urcrnrlat = 59.5, llcrnrlon = -12, urcrnrlon = 3.5, resolution = "i")
+basemap.drawmapboundary(linewidth = 0, fill_color = '#ffffff')
+basemap.fillcontinents(color = '#eeeeee')
+basemap.drawcoastlines(color = '#222222')</pre>
+
+        <p>Drawing the actual cluster centers involves iterating over them again. But this time, a call to the <code>basemap()</code> function will calculate the coordinates on the Basemap from the latitude and longitude values. Using the <code>scatter()</code> function of the basemap object, each cluster is plotted onto the map. To define the size of the resulting graphic, the line <code>z.configure_mpl(width=400, height=300, fmt='svg')</code> is added. Finally a call to <code>plt.show()</code> will ensure a clean visualization in Zeppelin without any intermediate outputs. Putting everything together, the script should look like this:</p>
+
+        <pre>
+%pyspark
+
+from numpy import array
+from pyspark.mllib.clustering import KMeans, KMeansModel
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+
+accidents = spark.read.option("header", "true").csv("hdfs://localhost:54310/user/vagrant/accidents/accidents_*.csv")
+accidents = accidents.filter("Latitude != 'null' AND Longitude != 'null'")
+accidents = accidents.select('Latitude', 'Longitude')
+accidents = accidents.rdd.map(lambda row: array(row.asDict().values()))
+clusters = KMeans.train(accidents, 10, initializationMode = "random")
+
+# Create the basemap
+basemap = Basemap(projection='merc',llcrnrlat=49.5, urcrnrlat=59.5, llcrnrlon=-12, urcrnrlon=3.5, resolution='i')
+basemap.drawmapboundary(linewidth=0, fill_color='#ffffff')
+basemap.fillcontinents(color='#eeeeee')
+basemap.drawcoastlines(color='#222222')
+
+# Plot the cluster centers
+for center in clusters.clusterCenters:
+    x, y = basemap(center[1], center[0])
+    basemap.scatter(x, y, 200, c='#cc3333', zorder = 2)
+
+z.configure_mpl(width=800, height=800, fmt='svg')
+plt.show()</pre>
+
+        <p>Executing the script above will produce an image similar to the one below. The clusters won't be placed on the exact locations, as the starting positions are randomized. In any case, this result is a lot more intuitive than a table of GPS coordinates. Playing with the different parameters for the Basemap, like the colors, allows for visualizations that can be seemlessly integrated in any other content and design.</p>
+
+        <img src="img/guide_006.png" alt="Accidents cluster visualization using Matplotlib and Basemap">
+
+        <h2 id="C07">Looking Forward</h2>
+
+        <p>I hope this guide could help in understanding how to use different types of tools in the field of Big Data. There are many more alternatives that can be used and it would be impossible to include them all. Which ones to choose depends entirely on the specific situation. This guide tries to function as a simple starting point from which the reader can gather enough knowledge to be able to recognize situations in which Big Data could be beneficial and how it could be utilised.</p>
+
+        <p>As a next step, I would recommend reading up on all the possibilities the different tools used in this guide offer and experimenting with them using the provided virtual machine. It may also be beneficial to look into different data sets and also different types of data sets. Generally speaking data can be categorized in two different ways. For one, there is <em>batch data</em>, as used in this guide, which is a finite dataset that is analysed and there is <em>streaming data</em>, which is a never ending stream of data that is analysed in real time. A good example for the latter would be Twitter and the never ending stream of new tweets generated by its users.</p>
+
+        <p>The other way to categorise data is by its structure. In this guide we mainly used <em>structured</em> data, which allows for easy analysis as its features are already exposed. Besides that, there is <em>unstructured</em> data and <em>semi-structured</em> data. Twitter is again a good example for the former. The content of each tweet is short text. A possible feature to extract from this unstructured data would be the hashtags used or the other users mentioned.</p>
+
+        <p>Semi-structured data is a special form of structured data in which each record contains already separated data attributes, but each record could contain a different set of theses attributes. The <em>Internet of Things</em> is a popular field in which semi-structured data widely exists. Collecting a stream of data from a number of different sensors will have structured data for each reading, but a temperature sensor will deliver different information than a humidity sensor.</p>
+
+        <h3>Handling Data</h3>
+
+        <p>These different types of data need to be consolidated before being able to make any analysis. Most of the time, it takes a lot of steps to ingest new data into the system. Steps that also need to be repeated on a schedule, or need to be done constantly in the case of streaming data. Therefore a lot of different tools have been created for the job of data ingestion that go way further than just putting data onto the HDFS. They can collect, pre-process and distribute the data using a multitude of different services and formats.</p>
+
+        <p>A good example for this is log data. Every software system creates logs for a number of different events and Big Data can help make sense of those logs. To get the data into the system, a tool like <a href="https://flume.apache.org/">Apache Flume</a> can be used, that is specifically designed to collect, aggregate and move log data between systems. Other tools like <a href="http://sqoop.apache.org/index.html">Apache Sqoop</a> and <a href="https://chukwa.apache.org/">Apache Chukwa</a> serve a more general purpose and can not only handle logs. With them data can be easily read, pre-processed and stored for further analyzation.</p>
+
+        <p>All in all, data ingestion is one of the most important steps of any Big Data application, as without sufficient data, no value can be extracted. The necessary tools highly depend on the situation, as sources and targets vary from use case to use case. But in any case they can help immensly in handling all kinds of data by automating the necessary steps of ingestion.</p>
+
+        <p>Combining tools to ingest new data into the system, analyzing the data using different methods and displaying the result using visualisations or explicit integrations into existing software systems will result in a complete Big Data infrastructure that is a lot more complex than the simple examples in this guide. Therefore it is detrimental to read up on the relevant topics and experiment with different tools in order to grasp Big Data any further.</p>
+    </body>
+</html>
